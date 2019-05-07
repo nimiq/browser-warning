@@ -1,3 +1,5 @@
+// written in old fashioned JavaScript to be able to run in old browsers
+
 (function () {
 
     function isWebApp() {
@@ -132,20 +134,54 @@
         }
     }
 
+    function showWarning(warning) {
+        // load css to hide elements marked with .hide-on-browser-warning
+        var $link = document.createElement('link');
+        $link.setAttribute('rel', 'stylesheet');
+        $link.setAttribute('href', 'warning.css');
+        document.head.append($link);
+
+        var browserWarningContainerId = 'browser-warning-container';
+        var browserWarningNoscriptId = 'browser-warning-noscript';
+
+        // replace the noscript as container by a div
+        var $warningNoscript = document.getElementById(browserWarningNoscriptId);
+        var $warningContainer = document.createElement('div');
+        $warningContainer.id = browserWarningContainerId;
+        $warningContainer.classList.add('browser-warning-container');
+        $warningContainer.innerHTML = $warningNoscript.textContent;
+        $warningNoscript.parentNode.replaceChild($warningContainer, $warningNoscript);
+
+        // set warning message
+        var $warningMessage = document.getElementById('browser-warning-message') || $warningContainer;
+        if (warning === 'web-view') {
+            $warningMessage.textContent = 'You are viewing this page from inside another app. Please use a real browser.'
+        } else if (warning === 'browser-edge') {
+            $warningMessage.textContent = 'The Edge browser is currently not supported.';
+        } else if (warning === 'no-local-storage') {
+            $warningMessage.textContent = 'Local Storage is not available. If you are in private browsing mode, try to run this page in normal mode.';
+        } else if (warning === 'private-mode') {
+            $warningMessage.textContent = 'This browser does not support running this page in private browsing mode. Try to run this page in normal mode.';
+        } else {
+            $warningMessage.textContent = 'Your browser is not able to run Nimiq. Please update your browser.';
+        }
+        document.body.setAttribute('data-browser-warning', warning); // such that the main page can adapt via css if it wants
+    }
+
     if (isWebView()) {
-        document.body.setAttribute('web-view', '');
+        showWarning('web-view');
     } else if (isEdge()) {
-        document.body.setAttribute('browser-edge', '');
+        showWarning('browser-edge');
     } else if (isBrowserOutdated()) {
-        document.body.setAttribute('browser-outdated', '');
+        showWarning('browser-outdated');
     } else if (!hasLocalStorage()) {
-        document.body.setAttribute('no-local-storage', '');
+        showWarning('no-local-storage');
     } else {
         // detect private browsing
         isPrivateMode().then(function (msg) {
             // Chrome is supported. All other browsers not.
             if (msg && !isChrome()) {
-                document.body.setAttribute('private-mode', '');
+                showWarning('private-mode');
             }
         });
     }
