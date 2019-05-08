@@ -1,8 +1,8 @@
 {
   "name": "@nimiq/browser-warning",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Browser Warning for unsupported browsers",
-  "main": "browser-warning.js",
+  "main": "dist/browser-warning.js",
   "repository": "git@github.com:nimiq/browser-warning.git",
   "author": "Nimiq",
   "license": "Apache-2.0",

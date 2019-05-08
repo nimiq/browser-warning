@@ -135,20 +135,12 @@
     }
 
     function showWarning(warning) {
-        // load css to hide elements marked with .hide-on-browser-warning
-        var $link = document.createElement('link');
-        $link.setAttribute('rel', 'stylesheet');
-        $link.setAttribute('href', 'warning.css');
-        document.head.append($link);
-
-        var browserWarningContainerId = 'browser-warning-container';
-        var browserWarningNoscriptId = 'browser-warning-noscript';
+        var browserWarningId = 'browser-warning-container';
 
         // replace the noscript as container by a div
-        var $warningNoscript = document.getElementById(browserWarningNoscriptId);
+        var $warningNoscript = document.getElementById(browserWarningId);
         var $warningContainer = document.createElement('div');
-        $warningContainer.id = browserWarningContainerId;
-        $warningContainer.classList.add('browser-warning-container');
+        $warningContainer.id = browserWarningId;
         $warningContainer.innerHTML = $warningNoscript.textContent;
         $warningNoscript.parentNode.replaceChild($warningContainer, $warningNoscript);
 
@@ -165,7 +157,10 @@
         } else {
             $warningMessage.textContent = 'Your browser is not able to run Nimiq. Please update your browser.';
         }
-        document.body.setAttribute('data-browser-warning', warning); // such that the main page can adapt via css if it wants
+
+        // set css class and global variable, so the app can react 
+        document.body.setAttribute('data-browser-warning', warning); 
+        window.hasBrowserWarning = true;
     }
 
     if (isWebView()) {
