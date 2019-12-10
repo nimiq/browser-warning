@@ -145,22 +145,73 @@
         $warningNoscript.parentNode.replaceChild($warningContainer, $warningNoscript);
 
         // set warning message
+        var $warningHeadline = document.getElementById('browser-warning-headline');
+        var $warningCopyLink = document.getElementById('browser-warning-copy-link');
         var $warningMessage = document.getElementById('browser-warning-message') || $warningContainer;
         if (warning === 'web-view') {
-            $warningMessage.textContent = 'You are viewing this page from inside another app. Please use a real browser.'
+            $warningHeadline.textContent = 'Please copy the link and paste it directly in Safari, Chrome or Firefox.';
+            $warningMessage.textContent = 'You\'re currently in a so-called in-app browser.';
+            $warningCopyLink.classList.add('show');
+            $warningCopyLink.getElementsByTagName('button')[0].addEventListener('click', e => {
+                copy(location.href);
+            });
+            if (navigator.share) {
+                navigator.share(location.href);
+            }
         } else if (warning === 'browser-edge') {
             $warningMessage.textContent = 'The Edge browser is currently not supported.';
         } else if (warning === 'no-local-storage') {
             $warningMessage.textContent = 'Local Storage is not available. If you are in private browsing mode, try to run this page in normal mode.';
         } else if (warning === 'private-mode') {
-            $warningMessage.textContent = 'This browser does not support running this page in private browsing mode. Try to run this page in normal mode.';
+            $warningMessage.textContent = 'This browser does not support opening this page in private browsing mode. Try to open this page in normal mode.';
         } else {
             $warningMessage.textContent = 'Your browser is not able to run Nimiq. Please update your browser.';
         }
 
-        // set css class and global variable, so the app can react 
-        document.body.setAttribute('data-browser-warning', warning); 
+        // set css class and global variable, so the app can react
+        document.body.setAttribute('data-browser-warning', warning);
         window.hasBrowserWarning = true;
+    }
+
+    function copy(text) {
+        var element = document.createElement('textarea');
+        element.value = text;
+        element.setAttribute('readonly', '');
+        element.style.contain = 'strict';
+        element.style.position = 'absolute';
+        element.style.left = '-9999px';
+        element.style.fontSize = '12pt'; // Prevent zooming on iOS
+
+        var selection = document.getSelection();
+        var originalRange = (selection && selection.rangeCount) > 0 ? selection.getRangeAt(0) : null;
+        var activeInput = document.activeElement
+            && (document.activeElement.nodeName === 'INPUT' || document.activeElement.nodeName === 'TEXTAREA')
+            ? document.activeElement
+            : null;
+
+        document.body.append(element);
+        element.select();
+        element.selectionStart = 0; // for iOs
+        element.selectionEnd = text.length;
+
+        var isSuccess = false;
+        try {
+            isSuccess = document.execCommand('copy');
+        } catch (e) {
+            // Ignore
+        }
+
+        element.remove();
+
+        if (activeInput) {
+            // Inputs retain their selection on blur. We just have to refocus again.
+            activeInput.focus();
+        } else if (originalRange) {
+            selection.removeAllRanges();
+            selection.addRange(originalRange);
+        }
+
+        return isSuccess;
     }
 
     if (isWebView()) {
@@ -180,4 +231,5 @@
             }
         });
     }
+
 })();
