@@ -1,11 +1,3 @@
 .hide-on-browser-warning {
     display: none !important;
 }
-
-#browser-warning-copy-link {
-    display: none;
-}
-
-#browser-warning-copy-link.show {
-    display: block;
-}

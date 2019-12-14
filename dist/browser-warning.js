@@ -146,17 +146,21 @@
 
         // set warning message
         var $warningHeadline = document.getElementById('browser-warning-headline');
-        var $warningCopyLink = document.getElementById('browser-warning-copy-link');
+        var $warningAdditional = document.getElementById('browser-warning-additional');
         var $warningMessage = document.getElementById('browser-warning-message') || $warningContainer;
         if (warning === 'web-view') {
-            $warningHeadline.textContent = 'Please copy the link and paste it directly in Safari, Chrome or Firefox.';
-            $warningMessage.textContent = 'You\'re currently in a so-called in-app browser.';
-            $warningCopyLink.classList.add('show');
-            $warningCopyLink.getElementsByTagName('button')[0].addEventListener('click', e => {
+            $warningHeadline.textContent = 'Please copy and paste the link into your browser.';
+            $warningMessage.textContent = 'You\'re currently in a so-called in-app browser. They have restricted funtionality. Please copy the link and paste it directly into Chrome, Firefox or Safari.';
+            $warningAdditional.innerHTML = '<button class="nq-button">Copy link</button>';
+            const $button = $warningAdditional.getElementsByTagName('button')[0];
+            $button.addEventListener('click', function(e) {
+                $button.classList.add('green');
                 copy(location.href);
+                setTimeout(function() { $button.classList.remove('green'); }, 3000);
             });
+
             if (navigator.share) {
-                navigator.share(location.href);
+                navigator.share({ data: location.href });
             }
         } else if (warning === 'browser-edge') {
             $warningMessage.textContent = 'The Edge browser is currently not supported.';
@@ -182,37 +186,22 @@
         element.style.left = '-9999px';
         element.style.fontSize = '12pt'; // Prevent zooming on iOS
 
-        var selection = document.getSelection();
-        var originalRange = (selection && selection.rangeCount) > 0 ? selection.getRangeAt(0) : null;
-        var activeInput = document.activeElement
-            && (document.activeElement.nodeName === 'INPUT' || document.activeElement.nodeName === 'TEXTAREA')
-            ? document.activeElement
-            : null;
-
         document.body.append(element);
         element.select();
-        element.selectionStart = 0; // for iOs
+        element.selectionStart = 0; // for iOS
         element.selectionEnd = text.length;
 
         var isSuccess = false;
         try {
             isSuccess = document.execCommand('copy');
-        } catch (e) {
-            // Ignore
-        }
+        } catch (e) {}
 
         element.remove();
 
-        if (activeInput) {
-            // Inputs retain their selection on blur. We just have to refocus again.
-            activeInput.focus();
-        } else if (originalRange) {
-            selection.removeAllRanges();
-            selection.addRange(originalRange);
-        }
-
         return isSuccess;
     }
+
+    return showWarning('web-view');
 
     if (isWebView()) {
         showWarning('web-view');

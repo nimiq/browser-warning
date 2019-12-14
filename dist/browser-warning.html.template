@@ -1,11 +1,10 @@
  <noscript id="browser-warning-container">
     <div id="browser-warning">
         <h1 id="browser-warning-headline">Uh oh, something went wrong.</h1>
-        <div id="browser-warning-copy-link">
-            <pre></pre><button class="nq-button">Copy link</button>
+        <div id="browser-warning-message">
+            We're sorry, but this app doesn't work properly without JavaScript enabled. Please enable it to continue.
         </div>
-        <div id="browser-warning-message">We're sorry, but this app doesn't work properly without JavaScript enabled. Please enable it to
-            continue.</div>
+        <div id="browser-warning-additional"></div>
     </div>
     <link rel="stylesheet" href="/browser-warning.css">
 </noscript>
