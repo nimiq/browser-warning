@@ -146,22 +146,34 @@
 
         // set warning message
         var $warningHeadline = document.getElementById('browser-warning-headline');
-        var $warningAdditional = document.getElementById('browser-warning-additional');
         var $warningMessage = document.getElementById('browser-warning-message') || $warningContainer;
         if (warning === 'web-view') {
-            $warningHeadline.textContent = 'Please copy and paste the link into your browser.';
-            $warningMessage.textContent = 'You\'re currently in a so-called in-app browser. They have restricted funtionality. Please copy the link and paste it directly into Chrome, Firefox or Safari.';
-            $warningAdditional.innerHTML = '<button class="nq-button">Copy link</button>';
-            const $button = $warningAdditional.getElementsByTagName('button')[0];
-            $button.addEventListener('click', function(e) {
-                $button.classList.add('green');
-                copy(location.href);
-                setTimeout(function() { $button.classList.remove('green'); }, 3000);
-            });
+            var isShareSupported = !!navigator.share;
+            $warningHeadline.textContent = 'Please open the page in your browser.';
+            $warningMessage.textContent = 'You\'re currently in a so-called in-app browser. '
+                + 'They have restricted functionality. '
+                + (isShareSupported
+                    ? 'Please use the button below and choose to open in Chrome, Firefox, Safari or another browser.'
+                    : 'Please copy the link and paste it directly into Chrome, Firefox, Safari or another browser.');
 
-            if (navigator.share) {
-                navigator.share({ data: location.href });
-            }
+            var $button = document.createElement('button');
+            $button.classList.add('nq-button');
+            $button.style.display = 'block'; // declare style here to avoid flash of unstyled content
+            $button.style.margin = '5rem auto 2rem';
+            $button.textContent = isShareSupported? 'Open in browser' : 'Copy link';
+            $button.addEventListener('click', function() {
+                if (isShareSupported) {
+                    navigator.share({
+                        title: window.title,
+                        url: location.href,
+                    });
+                } else {
+                    $button.classList.add('green');
+                    copy(location.href);
+                    setTimeout(function() { $button.classList.remove('green'); }, 1500);
+                }
+            });
+            $warningMessage.appendChild($button);
         } else if (warning === 'browser-edge') {
             $warningMessage.textContent = 'The Edge browser is currently not supported.';
         } else if (warning === 'no-local-storage') {
