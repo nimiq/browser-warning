@@ -201,8 +201,6 @@
         return isSuccess;
     }
 
-    return showWarning('web-view');
-
     if (isWebView()) {
         showWarning('web-view');
     } else if (isEdge()) {
