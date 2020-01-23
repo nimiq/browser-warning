@@ -147,46 +147,66 @@
         // set warning message
         var $warningHeadline = document.getElementById('browser-warning-headline');
         var $warningMessage = document.getElementById('browser-warning-message') || $warningContainer;
+        var useNativeShare = !!navigator.share;
+        var hasAlternativeCallToAction = false;
+        var shareTarget = 'Chrome, Firefox, Safari or another browser';
         if (warning === 'web-view') {
-            var isShareSupported = !!navigator.share;
             $warningHeadline.textContent = 'Please open the page in your browser.';
             $warningMessage.textContent = 'You\'re currently in a so-called in-app browser. '
-                + 'They have restricted functionality. '
-                + (isShareSupported
-                    ? 'Please use the button below and choose to open in Chrome, Firefox, Safari or another browser.'
-                    : 'Please copy the link and paste it directly into Chrome, Firefox, Safari or another browser.');
-
-            var $button = document.createElement('button');
-            $button.classList.add('nq-button');
-            $button.style.display = 'block'; // declare style here to avoid flash of unstyled content
-            $button.style.margin = '5rem auto 2rem';
-            $button.textContent = isShareSupported? 'Open in browser' : 'Copy link';
-            $button.addEventListener('click', function() {
-                if (isShareSupported) {
-                    navigator.share({
-                        title: window.title,
-                        url: location.href,
-                    });
-                } else {
-                    $button.classList.add('green');
-                    copy(location.href);
-                    setTimeout(function() { $button.classList.remove('green'); }, 1500);
-                }
-            });
-            $warningMessage.appendChild($button);
+                + 'They have restricted functionality.';
         } else if (warning === 'browser-edge') {
             $warningMessage.textContent = 'The Edge browser is currently not supported.';
-        } else if (warning === 'no-local-storage') {
-            $warningMessage.textContent = 'Local Storage is not available. If you are in private browsing mode, try to run this page in normal mode.';
-        } else if (warning === 'private-mode') {
-            $warningMessage.textContent = 'This browser does not support opening this page in private browsing mode. Try to open this page in normal mode.';
+        } else if (warning === 'no-local-storage' || warning === 'private-mode') {
+            $warningMessage.textContent = warning === 'no-local-storage'
+                ? 'Local Storage is not available. You might be in private browsing mode.'
+                : 'This browser does not support opening this page in private browsing mode.';
+            useNativeShare = false; // don't want to share to other app, just paste link in non private tab
+            shareTarget = 'a normal tab';
         } else {
             $warningMessage.textContent = 'Your browser is not able to run Nimiq. Please update your browser.';
+            hasAlternativeCallToAction = true;
         }
+
+        // setup sharing
+        $warningMessage.textContent = $warningMessage.textContent + ' '
+            + getShareInstructions(useNativeShare, hasAlternativeCallToAction, shareTarget);
+        $warningMessage.appendChild(createShareButton(useNativeShare));
 
         // set css class and global variable, so the app can react
         document.body.setAttribute('data-browser-warning', warning);
         window.hasBrowserWarning = true;
+    }
+
+    function getShareInstructions(useNativeShare, hasAlternativeCallToAction, shareTarget) {
+        var prefix = hasAlternativeCallToAction
+            ? 'Alternatively, '
+            : 'Please ';
+        var instructions = useNativeShare
+            ? 'use the button below and choose to open in '
+            : 'copy the link and open it in ';
+        return prefix + instructions + shareTarget + '.';
+    }
+
+    function createShareButton(useNativeShare) {
+        useNativeShare = useNativeShare && !!navigator.share;
+        var $button = document.createElement('button');
+        $button.classList.add('nq-button');
+        $button.style.display = 'block'; // declare style here to avoid flash of unstyled content
+        $button.style.margin = '5rem auto 2rem';
+        $button.textContent = useNativeShare? 'Open in browser' : 'Copy link';
+        $button.addEventListener('click', function() {
+            if (useNativeShare) {
+                navigator.share({
+                    title: window.title,
+                    url: location.href,
+                });
+            } else {
+                $button.classList.add('green');
+                copy(location.href);
+                setTimeout(function() { $button.classList.remove('green'); }, 1500);
+            }
+        });
+        return $button;
     }
 
     function copy(text) {
