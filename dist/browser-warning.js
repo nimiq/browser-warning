@@ -153,18 +153,23 @@
         var hasAlternativeCallToAction = false;
         var shareTarget = 'Chrome, Firefox, Safari or another browser';
         if (warningType === 'web-view') {
-            warning.headline = 'Please open the page in your browser.';
+            warning.headline = 'Please open the page in your browser';
             warning.message = 'You\'re currently in a so-called in-app browser. '
                 + 'They have restricted functionality.';
         } else if (warningType === 'browser-edge') {
+            warning.headline = 'Unsupported browser';
             warning.message = 'The Edge browser is currently not supported.';
         } else if (warningType === 'no-local-storage' || warningType === 'private-mode') {
+            warning.headline = warningType === 'no-local-storage'
+                ? 'Local storage not available'
+                : 'Incompatible private browsing mode';
             warning.message = warningType === 'no-local-storage'
-                ? 'Local Storage is not available. You might be in private browsing mode.'
+                ? 'Local storage is not available. You might be in private browsing mode.'
                 : 'This browser does not support opening this page in private browsing mode.';
             warning.useNativeShare = false; // don't want to share to other app, just paste link in non private tab
             shareTarget = 'a normal tab';
         } else {
+            warning.headline = 'Unsupported browser';
             warning.message = 'Your browser is not able to run Nimiq. Please update your browser.';
             hasAlternativeCallToAction = true;
         }
@@ -177,9 +182,7 @@
         }
 
         // render warning
-        if (warning.headline) {
-            document.getElementById('browser-warning-headline').textContent = warning.headline;
-        }
+        document.getElementById('browser-warning-headline').textContent = warning.headline;
         var $warningMessage = document.getElementById('browser-warning-message');
         $warningMessage.textContent = (warning.message ? warning.message : '')
             + ' ' + (warning.hasShareButton && warning.shareInstructions ? warning.shareInstructions : '');

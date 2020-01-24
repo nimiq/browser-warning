@@ -22,7 +22,7 @@ and a config object:
 |Parameter|Type|
 |---------|----|
 |warningType|'web-view' / 'browser-edge' / 'browser-outdated' / 'no-local-storage' / 'private-mode'|
-|warningConfig.headline|string?|
+|warningConfig.headline|string|
 |warningConfig.message|string|
 |warningConfig.hasShareButton|boolean|
 |warningConfig.shareUrl|string|
