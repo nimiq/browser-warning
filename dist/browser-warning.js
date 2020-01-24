@@ -78,15 +78,15 @@
      */
     function isPrivateMode() {
         return new Promise(function (resolve) {
-            const on = function () { resolve(true) }; // is in private mode
-            const off = function () { resolve(false) }; // not private mode
+            var on = function () { resolve(true) }; // is in private mode
+            var off = function () { resolve(false) }; // not private mode
             // Chrome & Opera
             if (window.webkitRequestFileSystem) {
                 return void window.webkitRequestFileSystem(0, 0, off, on);
             }
             // Firefox
             if ('MozAppearance' in document.documentElement.style) {
-                const db = indexedDB.open(null);
+                var db = indexedDB.open(null);
                 db.onerror = on;
                 db.onsuccess = off;
                 return void 0;
@@ -145,13 +145,14 @@
         var $warningContainer = document.createElement('div');
         $warningContainer.id = browserWarningId;
         $warningContainer.innerHTML = $warningNoscript.textContent;
-        $warningNoscript.parentNode.replaceChild($warningContainer, $warningNoscript);
+        $warningNoscript.insertAdjacentElement('beforebegin', $warningContainer);
+        $warningNoscript.parentNode.removeChild($warningNoscript);
 
         // configure warning
         var warning = {
             hasShareButton: true,
             useNativeShare: !!navigator.share,
-            shareUrl: location.href,
+            shareUrl: location.href
         };
         var hasAlternativeCallToAction = false;
         var shareTarget = 'Chrome, Firefox, Safari or another browser';
@@ -181,7 +182,13 @@
 
         // invoke callback
         if (window.onBrowserWarning) {
-            Object.assign(warning, window.onBrowserWarning(warningType, warning));
+            var overwrites = window.onBrowserWarning(warningType, warning);
+            if (overwrites) {
+                // Simplified Object.assign polyfill
+                for (var key in overwrites) {
+                    warning[key] = overwrites[key];
+                }
+            }
         }
 
         // render warning
@@ -211,21 +218,25 @@
     function createShareButton(shareUrl, useNativeShare) {
         useNativeShare = useNativeShare && !!navigator.share;
         var $button = document.createElement('button');
-        $button.classList.add('nq-button');
+        $button.className = 'nq-button';
         $button.style.display = 'block'; // declare style here to avoid flash of unstyled content
         $button.style.margin = '5rem auto 2rem';
         $button.textContent = useNativeShare? 'Open in browser' : 'Copy link';
-        $button.addEventListener('click', function() {
+        $button.onclick = function() {
             if (useNativeShare) {
-                navigator.share({
-                    url: shareUrl,
-                });
+                navigator.share({ url: shareUrl });
             } else {
-                $button.classList.add('green');
-                copy(shareUrl);
-                setTimeout(function() { $button.classList.remove('green'); }, 1500);
+                $button.className = 'nq-button green';
+                setTimeout(function() { $button.className = 'nq-button'; }, 1500);
+                if (!copy(shareUrl)) {
+                    alert('Copy failed. '
+                        + (shareUrl === location.href
+                            ? 'Please copy this page\'s URL manually from the address bar.'
+                            : 'Please input the following manually in another browser: ' + shareUrl)
+                    );
+                }
             }
-        });
+        };
         return $button;
     }
 
@@ -238,7 +249,7 @@
         element.style.left = '-9999px';
         element.style.fontSize = '12pt'; // Prevent zooming on iOS
 
-        document.body.append(element);
+        document.body.appendChild(element);
         element.select();
         element.selectionStart = 0; // for iOS
         element.selectionEnd = text.length;
@@ -248,17 +259,17 @@
             isSuccess = document.execCommand('copy');
         } catch (e) {}
 
-        element.remove();
+        element.parentNode.removeChild(element);
 
         return isSuccess;
     }
 
-    if (isWebView()) {
+    if (isBrowserOutdated()) {
+        showWarning('browser-outdated');
+    } else if (isWebView()) {
         showWarning('web-view');
     } else if (isEdge()) {
         showWarning('browser-edge');
-    } else if (isBrowserOutdated()) {
-        showWarning('browser-outdated');
     } else if (!hasLocalStorage()) {
         showWarning('no-local-storage');
     } else {
