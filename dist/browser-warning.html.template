@@ -5,5 +5,5 @@
             We're sorry, but this app doesn't work properly without JavaScript enabled. Please enable it to continue.
         </div>
     </div>
-    <link rel="stylesheet" href="/browser-warning.css">
+    <link rel="stylesheet" href="browser-warning.css">
 </noscript>
