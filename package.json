@@ -10,5 +10,11 @@
   "files": [
     "dist",
     "types"
-  ]
+  ],
+  "scripts": {
+    "build": "google-closure-compiler --js=src/browser-warning.js --js_output_file=dist/browser-warning.js --language_in=ECMASCRIPT3 --language_out=ECMASCRIPT3 --compilation_level=SIMPLE --create_source_map=dist/browser-warning.js.map && echo -e '//# sourceMappingURL=browser-warning.js.map' >> dist/browser-warning.js"
+  },
+  "devDependencies": {
+    "google-closure-compiler": "^20200112.0.0"
+  }
 }

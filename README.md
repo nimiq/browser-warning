@@ -43,3 +43,16 @@ exception to the rule stated in the previous section.
 
 Note that the script that defines `window.onBrowserWarning` **must be written in old-fashioned Javascript** to not fail
 with syntax errors in old browsers which would prevent us from being able to display a warning in old browsers.
+
+## Contributing
+
+Contributions are welcome! To build the code yourself run
+```
+yarn build
+```
+which minifies the code with Google's closure compiler. We are compiling with the compiler's `SIMPLE` compilation level
+as the `ADVANCED` level does not result in significantly smaller files for this lib, especially when comparing gzipped
+size. You therefore do not need to mind the special precautions that are required for the `ADVANCED` level.
+
+Code does however need to be written in old-fashioned javascript to be compatible with old browsers. The closure
+compiler will warn you if your code is not valid ES3.

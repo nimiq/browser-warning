@@ -1,0 +1,4 @@
+.idea
+node_modules
+dist/browser-warning.js
+dist/browser-warning.js.map
