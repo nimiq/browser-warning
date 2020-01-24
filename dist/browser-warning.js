@@ -134,7 +134,7 @@
         }
     }
 
-    function showWarning(warning) {
+    function showWarning(warningType) {
         var browserWarningId = 'browser-warning-container';
 
         // replace the noscript as container by a div
@@ -144,36 +144,51 @@
         $warningContainer.innerHTML = $warningNoscript.textContent;
         $warningNoscript.parentNode.replaceChild($warningContainer, $warningNoscript);
 
-        // set warning message
-        var $warningHeadline = document.getElementById('browser-warning-headline');
-        var $warningMessage = document.getElementById('browser-warning-message') || $warningContainer;
-        var useNativeShare = !!navigator.share;
+        // configure warning
+        var warning = {
+            hasShareButton: true,
+            useNativeShare: !!navigator.share,
+            shareUrl: location.href,
+        };
         var hasAlternativeCallToAction = false;
         var shareTarget = 'Chrome, Firefox, Safari or another browser';
-        if (warning === 'web-view') {
-            $warningHeadline.textContent = 'Please open the page in your browser.';
-            $warningMessage.textContent = 'You\'re currently in a so-called in-app browser. '
+        if (warningType === 'web-view') {
+            warning.headline = 'Please open the page in your browser.';
+            warning.message = 'You\'re currently in a so-called in-app browser. '
                 + 'They have restricted functionality.';
-        } else if (warning === 'browser-edge') {
-            $warningMessage.textContent = 'The Edge browser is currently not supported.';
-        } else if (warning === 'no-local-storage' || warning === 'private-mode') {
-            $warningMessage.textContent = warning === 'no-local-storage'
+        } else if (warningType === 'browser-edge') {
+            warning.message = 'The Edge browser is currently not supported.';
+        } else if (warningType === 'no-local-storage' || warningType === 'private-mode') {
+            warning.message = warningType === 'no-local-storage'
                 ? 'Local Storage is not available. You might be in private browsing mode.'
                 : 'This browser does not support opening this page in private browsing mode.';
-            useNativeShare = false; // don't want to share to other app, just paste link in non private tab
+            warning.useNativeShare = false; // don't want to share to other app, just paste link in non private tab
             shareTarget = 'a normal tab';
         } else {
-            $warningMessage.textContent = 'Your browser is not able to run Nimiq. Please update your browser.';
+            warning.message = 'Your browser is not able to run Nimiq. Please update your browser.';
             hasAlternativeCallToAction = true;
         }
+        warning.shareInstructions = getShareInstructions(warning.useNativeShare, hasAlternativeCallToAction,
+            shareTarget);
 
-        // setup sharing
-        $warningMessage.textContent = $warningMessage.textContent + ' '
-            + getShareInstructions(useNativeShare, hasAlternativeCallToAction, shareTarget);
-        $warningMessage.appendChild(createShareButton(useNativeShare));
+        // invoke callback
+        if (window.onBrowserWarning) {
+            Object.assign(warning, window.onBrowserWarning(warningType, warning));
+        }
+
+        // render warning
+        if (warning.headline) {
+            document.getElementById('browser-warning-headline').textContent = warning.headline;
+        }
+        var $warningMessage = document.getElementById('browser-warning-message');
+        $warningMessage.textContent = (warning.message ? warning.message : '')
+            + ' ' + (warning.hasShareButton && warning.shareInstructions ? warning.shareInstructions : '');
+        if (warning.hasShareButton) {
+            $warningMessage.appendChild(createShareButton(warning.shareUrl, warning.useNativeShare));
+        }
 
         // set css class and global variable, so the app can react
-        document.body.setAttribute('data-browser-warning', warning);
+        document.body.setAttribute('data-browser-warning', warningType);
         window.hasBrowserWarning = true;
     }
 
@@ -187,7 +202,7 @@
         return prefix + instructions + shareTarget + '.';
     }
 
-    function createShareButton(useNativeShare) {
+    function createShareButton(shareUrl, useNativeShare) {
         useNativeShare = useNativeShare && !!navigator.share;
         var $button = document.createElement('button');
         $button.classList.add('nq-button');
@@ -197,12 +212,11 @@
         $button.addEventListener('click', function() {
             if (useNativeShare) {
                 navigator.share({
-                    title: window.title,
-                    url: location.href,
+                    url: shareUrl,
                 });
             } else {
                 $button.classList.add('green');
-                copy(location.href);
+                copy(shareUrl);
                 setTimeout(function() { $button.classList.remove('green'); }, 1500);
             }
         });
