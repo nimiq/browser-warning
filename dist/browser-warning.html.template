@@ -1,4 +1,4 @@
- <noscript id="browser-warning-container">
+<noscript id="browser-warning-container">
     <div id="browser-warning">
         <h1 id="browser-warning-headline">Please enable JavaScript</h1>
         <div id="browser-warning-message">

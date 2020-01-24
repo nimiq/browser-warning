@@ -3,15 +3,15 @@
 (function () {
 
     function isWebApp() {
-      var isIOSWebApp = (window.navigator.standalone === true);
-      var isChromeWebApp = (window.matchMedia('(display-mode: standalone)').matches);
+        var isIOSWebApp = (window.navigator.standalone === true);
+        var isChromeWebApp = (window.matchMedia('(display-mode: standalone)').matches);
 
-      return isIOSWebApp || isChromeWebApp;
+        return isIOSWebApp || isChromeWebApp;
     }
 
     function isWebView() {
         if (isWebApp()) {
-          return false;
+            return false;
         }
 
         var userAgent = navigator.userAgent;
@@ -67,8 +67,7 @@
             /Constructor/.test(window.HTMLElement) ||
             (function (root) {
                 return (!root || root.pushNotification).toString() === '[object SafariRemoteNotification]';
-            }
-            )(window.safari)
+            })(window.safari)
         );
     }
 
@@ -123,16 +122,16 @@
             // If the length is > 0 then we really just exceed the storage limit.
             // If another exception is thrown then probably localStorage is undefined.
             return e instanceof DOMException && (
-                // everything except Firefox
-                e.code === 22 ||
-                // Firefox
-                e.code === 1014 ||
-                // test name field too, because code might not be present
-                // everything except Firefox
-                e.name === 'QuotaExceededError' ||
-                // Firefox
-                e.name === 'NS_ERROR_DOM_QUOTA_REACHED'
-            ) &&
+                    // everything except Firefox
+                    e.code === 22 ||
+                    // Firefox
+                    e.code === 1014 ||
+                    // test name field too, because code might not be present
+                    // everything except Firefox
+                    e.name === 'QuotaExceededError' ||
+                    // Firefox
+                    e.name === 'NS_ERROR_DOM_QUOTA_REACHED'
+                ) &&
                 // acknowledge QuotaExceededError only if there's something already stored
                 storage.length !== 0;
         }
@@ -270,9 +269,9 @@
         showWarning('no-local-storage');
     } else {
         // detect private browsing
-        isPrivateMode().then(function (msg) {
+        isPrivateMode().then(function (isPrivate) {
             // Chrome is supported. All other browsers not.
-            if (msg && !isChrome()) {
+            if (isPrivate && !isChrome()) {
                 showWarning('private-mode');
             }
         });
