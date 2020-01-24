@@ -19,7 +19,10 @@
         if ((typeof navigator.mediaDevices === 'undefined'
             || typeof navigator.mediaDevices.getUserMedia === 'undefined')
             // iOS Chrome is a Web View (or at least doesn't support media devices), but still a browser
-            && !/CriOS/i.test(userAgent)) return true;
+            && !/CriOS/i.test(userAgent)
+            // Outdated browsers don't have mediaDevices even though they're not web views
+            && !isBrowserOutdated()
+        ) return true;
 
         var inAppBrowsers = ['FB_IAB', 'Instagram'];
 
