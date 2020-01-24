@@ -2,6 +2,12 @@
 
 Javascipt, CSS and a html snippet to display a warning in case of unsupported browsers, private mode or disabled Javascript.
 
+## Installation
+
+```
+yarn add @nimiq/browser-warning
+```
+
 ## Usage
 
 This is no modular package you can import. Instead:
@@ -11,6 +17,9 @@ This is no modular package you can import. Instead:
   front of all other scripts which may execute, especially your app's main entry point. If your other scripts are not
   deferred, also remove the `defer` attribute on `browser-warning.js`.
 * In your app's main entry point logic, check for `window.hasBrowserWarning === true` and stop execution in that case.
+* If you're using typescript, add `@nimiq/browser-warning` to
+  [`compilerOptions.types`](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types)
+  in your `tsconfig.json`.
 
 Note: Your app needs to be located at root level of the domain, otherwise the paths are incorrect.
 

@@ -3,10 +3,12 @@
   "version": "0.4.0",
   "description": "Browser Warning for unsupported browsers",
   "main": "dist/browser-warning.js",
+  "types": "types/browser-warning.d.ts",
   "repository": "git@github.com:nimiq/browser-warning.git",
   "author": "Nimiq",
   "license": "Apache-2.0",
   "files": [
-    "dist"
+    "dist",
+    "types"
   ]
 }
