@@ -43,7 +43,7 @@
         } catch (e) {
             return true;
         }
-        return isOutdatedIos();
+        return isOutdatedIos() || isOutdatedEdge();
     }
 
     function isOutdatedIos() {
@@ -53,7 +53,8 @@
         return version[0] < 11 || (version[0] === 11 && (version[1] <= 2));
     }
 
-    function isEdge() {
+    function isOutdatedEdge() {
+        // Note that webkit based Edge versions that are compatible have a user agent of Edg instead of Edge
         return navigator.userAgent.indexOf('Edge') !== -1;
     }
 
@@ -160,9 +161,6 @@
             warning.headline = 'Please open the page in your browser';
             warning.message = 'You\'re currently in a so-called in-app browser. '
                 + 'They have restricted functionality.';
-        } else if (warningType === 'browser-edge') {
-            warning.headline = 'Unsupported browser';
-            warning.message = 'The Edge browser is currently not supported.';
         } else if (warningType === 'no-local-storage' || warningType === 'private-mode') {
             warning.headline = warningType === 'no-local-storage'
                 ? 'Local storage not available'
@@ -268,8 +266,6 @@
         showWarning('browser-outdated');
     } else if (isWebView()) {
         showWarning('web-view');
-    } else if (isEdge()) {
-        showWarning('browser-edge');
     } else if (!hasLocalStorage()) {
         showWarning('no-local-storage');
     } else {
