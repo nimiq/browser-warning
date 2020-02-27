@@ -18,6 +18,8 @@
 
         if ((typeof navigator.mediaDevices === 'undefined'
             || typeof navigator.mediaDevices.getUserMedia === 'undefined')
+            // Avoid false positives on pages served over http where mediaDevices are disabled
+            && (location.protocol === 'https:' || location.hostname === 'localhost')
             // iOS Chrome is a Web View (or at least doesn't support media devices), but still a browser
             && !/CriOS/i.test(userAgent)
             // Outdated browsers don't have mediaDevices even though they're not web views

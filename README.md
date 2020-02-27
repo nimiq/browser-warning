@@ -20,6 +20,7 @@ This is no modular package you can import. Instead:
 * If you're using typescript, add `@nimiq/browser-warning` to
   [`compilerOptions.types`](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types)
   in your `tsconfig.json`.
+* It is recommended to serve your app via https as otherwise in-app web-views might not be correctly detected.
 
 ## Configuration
 
