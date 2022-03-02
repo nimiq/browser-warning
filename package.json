@@ -1,6 +1,6 @@
 {
   "name": "@nimiq/browser-warning",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Browser Warning for unsupported browsers",
   "main": "dist/browser-warning.js",
   "types": "types/browser-warning.d.ts",
